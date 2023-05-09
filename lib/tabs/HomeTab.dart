@@ -17,10 +17,12 @@ List<Map> doctors = [
 
 class HomeTab extends StatelessWidget {
   final void Function() onPressedScheduleCard;
+  final String usernameSet; // New parameter
 
   const HomeTab({
     Key? key,
     required this.onPressedScheduleCard,
+    required this.usernameSet, // Add new parameter
   }) : super(key: key);
 
   @override
@@ -35,7 +37,7 @@ class HomeTab extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
-            UserIntro(),
+            UserIntro(usernameSet:usernameSet),
             SizedBox(
               height: 10,
             ),
@@ -464,10 +466,14 @@ class SearchInput extends StatelessWidget {
 class UserIntro extends StatelessWidget {
        static String usernameconnect="user" ;
 
+  final usernameSet;
+
   const UserIntro({
     Key? key,
+    required this.usernameSet
    
   }) : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
@@ -497,7 +503,7 @@ fetchUserProfile();
               style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
             ),
             new Text(
-              '$usernameconnect 👋',
+              '$usernameSet 👋',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
           

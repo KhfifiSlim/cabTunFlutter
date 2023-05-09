@@ -7,9 +7,10 @@ import 'package:flutter_login_register_nodejs/tabs/ScheduleTab.dart';
 
 import 'pages/login_page.dart';
 import 'pages/register_page.dart';
+import 'screens/SplashScreen.dart';
 import 'services/shared_service.dart';
 
-Widget _defaultHome = const LoginPage();
+Widget _defaultHome = const PageSplashScreen();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +18,7 @@ void main() async {
   // Get result of the login function.
   bool _result = await SharedService.isLoggedIn();
   if (_result) {
-    _defaultHome = const Home();
+    _defaultHome = const LoginPage();
   }
 
   runApp(const MyApp());

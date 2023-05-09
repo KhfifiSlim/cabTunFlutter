@@ -16,7 +16,8 @@ import 'shared_service.dart';
 class APIService {
   static var client = http.Client();
  // static var iduser ="63f273f153d7eb35bdf32dcd";
- static String idlogged = "";
+  static String idlogged = "";
+  static int userTel = 0;
   static verifToken() async {
       SharedPreferences.getInstance().then((SharedPreferences prefs) {
       final token = prefs.getString('token');
@@ -63,6 +64,7 @@ class APIService {
       var responseBody = jsonDecode(response.body);
       var token = responseBody['data']['token'];
       idlogged = responseBody['data']['id'];
+      userTel = responseBody['data']['tel'];
       debugPrint(idlogged);
       
        SharedPreferences.getInstance().then((SharedPreferences prefs) {
@@ -106,8 +108,8 @@ class APIService {
     var responseBody = jsonDecode(response.body);
     var message = responseBody['message'];
     //var token = responseBody['data']['token'];
-    debugPrint('Response body: ${message}');
-    print(message);
+   // debugPrint('Response body: ${message}');
+    //print(message);
 
     if (message == "Success") {
       
@@ -115,19 +117,134 @@ class APIService {
       var responseBody = jsonDecode(response.body);
       var object = responseBody['data']['user'][0];
       // var token = responseBody['data']['token'];
-      print(object);
+     //r print(object);
     
     
 
       //return "Success";
       return object;
-  
+
     }else{
       return {"error": "Error fetching user profile."};
     }
   }
 
 
+
+  // static Future<Object> getHeureByDate() async {
+  //   Map<String, String> requestHeaders = {
+  //     'Content-Type': 'application/json',
+  //   };
+  //   var data = {"date": "05/05/2023"};
+  //   var url = Uri.http(
+  //     Config.apiURL,
+  //     Config.getHeureByDate,
+  //   );
+
+
+  //   var response = await client.post(
+  //     url,
+  //     headers: requestHeaders,
+  //     body: jsonEncode(data),
+  //   );
+  //  // print(response);
+
+  //   var responseBody = jsonDecode(response.body);
+  //   var message = responseBody['message'];
+  //   //var token = responseBody['data']['token'];
+  //   debugPrint('Response body: ${message}');
+  //    debugPrint('slimmmmmmmmmmmmm');
+    
+
+  //   if (message == "Success") {
+  //     var responseBody = jsonDecode(response.body);
+  //     var object = responseBody['data'];
+   
+  //     return object;
+
+
+  //   }else{
+  //     return {"error": "Error fetching heure."};
+  //   }
+  // }
+
+
+
+
+
+  static Future<Object> getReservation() async {
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+    };
+    var data = {"num": userTel};
+    var url = Uri.http(
+      Config.apiURL,
+      Config.getAllReservation,
+    );
+
+
+    var response = await client.post(
+      url,
+      headers: requestHeaders,
+      body: jsonEncode(data),
+    );
+    print(response);
+
+    var responseBody = jsonDecode(response.body);
+    var message = responseBody['message'];
+    //var token = responseBody['data']['token'];
+    debugPrint('Response body: ${message}');
+    List<Map<String, dynamic>> schedules = [];
+
+    if (message == "Success") {
+      var responseBody = jsonDecode(response.body);
+      var object = responseBody['data'];
+      //print(object);
+      for (var item in object) {
+        // Do something with each item
+        schedules.add(item);
+      }
+
+      //return "Success";
+      return schedules;
+
+
+    }else{
+      return {"error": "Error fetching Reservation."};
+    }
+  }
+
+  static Future<String> annulerReservation(String id) async {
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+    };
+    var data = {"status" : 2};
+    var url = Uri.http(
+      Config.apiURL,
+      Config.annulerReservation+id,
+    );
+
+
+    var response = await client.post(
+      url,
+      headers: requestHeaders,
+      body: jsonEncode(data),
+    );
+    print(response);
+
+    var responseBody = jsonDecode(response.body);
+    var message = responseBody['message'];
+    //var token = responseBody['data']['token'];
+    debugPrint('Response body: ${message}');
+    List<Map<String, dynamic>> schedules = [];
+
+    if (message == "Success") {
+      return "Success";
+
+    }else{
+      return "Error Annuler Reservation.";
+    }
+  }
 
  static Future<Map<String, dynamic>> getnondisp() async {
   Map<String, String> requestHeaders = {

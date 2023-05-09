@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_login_register_nodejs/styles/colors.dart';
 import 'package:flutter_login_register_nodejs/styles/styles.dart';
+import '../services/api_service.dart';
 
 class ScheduleTab extends StatefulWidget {
   const ScheduleTab({Key? key}) : super(key: key);
@@ -8,68 +11,93 @@ class ScheduleTab extends StatefulWidget {
   @override
   State<ScheduleTab> createState() => _ScheduleTabState();
 }
+List<Map<String, dynamic>> schedules = [];
+enum FilterStatus { Encours, Complet, Annuler }
+Future<void> fetchdates() async {
 
-enum FilterStatus { Upcoming, Complete, Cancel }
+  try {
+    schedules = [];
+    final response = await APIService.getReservation();
+    print("Test");
+    schedules = response as List<Map<String, dynamic>>;
+    print(schedules);
+  } catch (error) {
+    print(error);
+  }
+}
 
-List<Map> schedules = [
-  {
-    'img': 'assets/doctor01.jpeg',
-    'doctorName': 'Dr. Anastasya Syahid',
-    'doctorTitle': 'Dental Specialist',
-    'reservedDate': 'Monday, Aug 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Upcoming
-  },
-  {
-    'img': 'assets/doctor02.png',
-    'doctorName': 'Dr. Mauldya Imran',
-    'doctorTitle': 'Skin Specialist',
-    'reservedDate': 'Monday, Sep 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Upcoming
-  },
-  {
-    'img': 'assets/doctor03.jpeg',
-    'doctorName': 'Dr. Rihanna Garland',
-    'doctorTitle': 'General Specialist',
-    'reservedDate': 'Monday, Jul 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Upcoming
-  },
-  {
-    'img': 'assets/doctor04.jpeg',
-    'doctorName': 'Dr. John Doe',
-    'doctorTitle': 'Something Specialist',
-    'reservedDate': 'Monday, Jul 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Complete
-  },
-  {
-    'img': 'assets/doctor05.jpeg',
-    'doctorName': 'Dr. Sam Smithh',
-    'doctorTitle': 'Other Specialist',
-    'reservedDate': 'Monday, Jul 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Cancel
-  },
-  {
-    'img': 'assets/doctor05.jpeg',
-    'doctorName': 'Dr. Sam Smithh',
-    'doctorTitle': 'Other Specialist',
-    'reservedDate': 'Monday, Jul 29',
-    'reservedTime': '11:00 - 12:00',
-    'status': FilterStatus.Cancel
-  },
-];
+// List<Map> schedules = [
+//   {
+//     'img': 'assets/doctor01.jpeg',
+//     'doctorName': 'Dr. Anastasya Syahid',
+//     'doctorTitle': 'Dental Specialist',
+//     'reservedDate': 'Monday, Aug 29',
+//     'reservedTime': '11:00 - 12:00',
+//     'status': 0
+//   },
+//   {
+//     'img': 'assets/doctor02.png',
+//     'doctorName': 'Dr. Mauldya Imran',
+//     'doctorTitle': 'Skin Specialist',
+//     'reservedDate': 'Monday, Sep 29',
+//     'reservedTime': '11:00 - 12:00',
+//     'status': 1
+//   },
+//   {
+//     'img': 'assets/doctor03.jpeg',
+//     'doctorName': 'Dr. Rihanna Garland',
+//     'doctorTitle': 'General Specialist',
+//     'reservedDate': 'Monday, Jul 29',
+//     'reservedTime': '11:00 - 12:00',
+//     'status': 2
+//   },
+//   {
+//     'img': 'assets/doctor04.jpeg',
+//     'doctorName': 'Dr. John Doe',
+//     'doctorTitle': 'Something Specialist',
+//     'reservedDate': 'Monday, Jul 29',
+//     'reservedTime': '11:00 - 12:00',
+//     'status': 0
+//   },
+//   {
+//     'img': 'assets/doctor05.jpeg',
+//     'doctorName': 'Dr. Sam Smithh',
+//     'doctorTitle': 'Other Specialist',
+//     'reservedDate': 'Monday, Jul 29',
+//     'reservedTime': '11:00 - 12:00',
+//     'status': 1
+//   },
+//   {
+//     'img': 'assets/doctor05.jpeg',
+//     'doctorName': 'Dr. Sam Smithh',
+//     'doctorTitle': 'Other Specialist',
+//     'reservedDate': 'Monday, Jul 29',
+//     'reservedTime': '11:00 - 12:00',
+//     'status': 0
+//   },
+// ];
 
 class _ScheduleTabState extends State<ScheduleTab> {
-  FilterStatus status = FilterStatus.Upcoming;
+  FilterStatus status = FilterStatus.Encours;
+  int currentStatus = 0 ;
   Alignment _alignment = Alignment.centerLeft;
+
+  void initState() {
+    super.initState();
+    fetchdates();
+  }
+  void _callApiFunction(String id) async {
+    // Your API call code here
+    print("Test confirmed");
+    var response = await APIService.annulerReservation(id);
+    if(response == "Success")
+    Navigator.pushNamed(context, '/ScheduleTab');
+  }
 
   @override
   Widget build(BuildContext context) {
     List<Map> filteredSchedules = schedules.where((var schedule) {
-      return schedule['status'] == status;
+      return schedule['status'] == currentStatus;
     }).toList();
 
     return Scaffold(
@@ -79,7 +107,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Schedule',
+              'Mes réservations',
               textAlign: TextAlign.center,
               style: kTitleStyle,
             ),
@@ -103,16 +131,19 @@ class _ScheduleTabState extends State<ScheduleTab> {
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (filterStatus == FilterStatus.Upcoming) {
-                                  status = FilterStatus.Upcoming;
+                                if (filterStatus == FilterStatus.Encours) {
+                                  status = FilterStatus.Encours;
+                                  currentStatus = 0;
                                   _alignment = Alignment.centerLeft;
                                 } else if (filterStatus ==
-                                    FilterStatus.Complete) {
-                                  status = FilterStatus.Complete;
+                                    FilterStatus.Complet) {
+                                  status = FilterStatus.Complet;
+                                  currentStatus = 1;
                                   _alignment = Alignment.center;
                                 } else if (filterStatus ==
-                                    FilterStatus.Cancel) {
-                                  status = FilterStatus.Cancel;
+                                    FilterStatus.Annuler) {
+                                  status = FilterStatus.Annuler;
+                                  currentStatus = 2;
                                   _alignment = Alignment.centerRight;
                                 }
                               });
@@ -171,33 +202,19 @@ class _ScheduleTabState extends State<ScheduleTab> {
                         children: [
                           Row(
                             children: [
-                              CircleAvatar(
-                                backgroundImage: AssetImage(_schedule['img']),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    _schedule['doctorName'],
-                                    style: TextStyle(
-                                      color: Color(MyColors.header01),
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    _schedule['doctorTitle'],
-                                    style: TextStyle(
-                                      color: Color(MyColors.grey02),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                                  // Text(
+                                  //   _schedule['name'],
+                                  //   style: TextStyle(
+                                  //     color: Color(MyColors.header01),
+                                  //     fontWeight: FontWeight.w700,
+                                  //   ),
+                                  // ),
+                                  // SizedBox(
+                                  //   height: 5,
+                                  // ),
                                 ],
                               ),
                             ],
@@ -205,30 +222,101 @@ class _ScheduleTabState extends State<ScheduleTab> {
                           SizedBox(
                             height: 15,
                           ),
-                          DateTimeCard(),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Color(MyColors.bg03),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      width: double.infinity,
+                      padding: EdgeInsets.all(20),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today,
+                                color: Color(MyColors.primary),
+                                size: 15,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                  _schedule['date'],
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(MyColors.primary),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.access_alarm,
+                                color: Color(MyColors.primary),
+                                size: 17,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                _schedule['heure'],
+                                style: TextStyle(
+                                  color: Color(MyColors.primary),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
                           SizedBox(
                             height: 15,
                           ),
+                          if(currentStatus == 0)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
                                 child: OutlinedButton(
-                                  child: Text('Cancel'),
-                                  onPressed: () {},
+                                  child: Text('Annuler'),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Confirmation'),
+                                          content: Text('Êtes-vous sûr de vouloir annuler la réservation ?'),
+                                          actions: [
+                                            TextButton(
+                                              child: Text('Cancel'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                            TextButton(
+                                              child: Text('Confirm'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                // Call the API function with the id
+                                                _callApiFunction(_schedule['id']);
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
                                 ),
                               ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Expanded(
-                                child: ElevatedButton(
-                                  child: Text('Reschedule'),
-                                  onPressed: () => {},
-                                ),
-                              )
                             ],
                           )
+
                         ],
                       ),
                     ),
@@ -244,9 +332,14 @@ class _ScheduleTabState extends State<ScheduleTab> {
 }
 
 class DateTimeCard extends StatelessWidget {
-  const DateTimeCard({
+  const DateTimeCard( {
     Key? key,
+    required String date,
+    required String time,
   }) : super(key: key);
+
+  String get date => date;
+  String get time => time;
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +365,7 @@ class DateTimeCard extends StatelessWidget {
                 width: 5,
               ),
               Text(
-                'Mon, July 29',
+                date,
                 style: TextStyle(
                   fontSize: 12,
                   color: Color(MyColors.primary),
@@ -292,7 +385,7 @@ class DateTimeCard extends StatelessWidget {
                 width: 5,
               ),
               Text(
-                '11:00 ~ 12:10',
+                time,
                 style: TextStyle(
                   color: Color(MyColors.primary),
                   fontWeight: FontWeight.bold,

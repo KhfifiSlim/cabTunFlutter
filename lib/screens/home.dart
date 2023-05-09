@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_register_nodejs/styles/colors.dart';
 import 'package:flutter_login_register_nodejs/tabs/HomeTab.dart';
 import 'package:flutter_login_register_nodejs/tabs/ScheduleTab.dart';
+import '../services/api_service.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -17,6 +18,8 @@ List<Map> navigationBarItems = [
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
+  String usernamepatient = "";
+
   void goToSchedule() {
     setState(() {
       _selectedIndex = 1;
@@ -24,10 +27,28 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    fetchUserProfile();
+
+  }
+
+  Future<void> fetchUserProfile() async {
+    try {
+      final response = await APIService.getUserProfile();
+      usernamepatient = response['username'];
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+
     List<Widget> screens = [
       HomeTab(
         onPressedScheduleCard: goToSchedule,
+        usernameSet: usernamepatient,
       ),
       ScheduleTab(),
     ];

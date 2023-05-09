@@ -12,7 +12,7 @@ class Profile extends StatefulWidget {
 
     @override
   ProfileState createState() => ProfileState();
-   
+
   static String usernameconn = "username";
   //static String email = "email";
   void getToken() async {
@@ -27,63 +27,64 @@ class Profile extends StatefulWidget {
   }
 }
 class ProfileState extends State<Profile> {
-  
+  @override
+  void initState() {
+    super.initState();
+    fetchUserProfile();
+
+  }
+  Future<void> fetchUserProfile() async {
+    try {
+      final response = await APIService.getUserProfile();
+      setState(() {
+        email = response['email'];
+        usernamepatient = response['username'];
+        tel = response['tel'].toString();
+      });
+    } catch (error) {
+      print(error);
+    }
+  }
+
 bool _isLoading = false;
   bool isApiCallProcess = false;
   bool hidePassword = true;
   GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   String? userName;
   String? password;
-  
+
  static String email = "email user";
 static String usernamepatient = "username patient";
 static String tel = "tel user";
-  @override
-  void initState() {
-    super.initState();
-  }
-  @override
+
+@override
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
-   
+
 /*
  APIService.getUserProfile().then(
                (response) {
-       
 
-      
+
+
             email = response['email'];
             usernamepatient = response['username'];
             tel = response['tel'].toString();
-        
-        
+
+
 
               }
  );
 */
-Future<void> fetchUserProfile() async {
-  try {
-    final response = await APIService.getUserProfile();
-    email = response['email'];
-    usernamepatient = response['username'];
-    tel = response['tel'].toString();
-  } catch (error) {
-    print(error);
-  }
-}
-
-// Call the function
-fetchUserProfile();
-
-    //getToken();
+   //getToken();
     SharedPreferences.getInstance().then((SharedPreferences prefs) {
       final token = prefs.getString('token');
       print('Token get: $token');
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token!);
       String username = decodedToken['data'];
       print(username);
-     
+
       //print(usernameconn);
     });
     //print(usernameconn);
@@ -167,72 +168,7 @@ fetchUserProfile();
                             children: <Widget>[
                               infoChild(_width, Icons.email, email),
                               infoChild(_width, Icons.call, tel),
-                              
-                              new Padding(
-                                padding: new EdgeInsets.only(top: _height / 30),
-                                child: new Container(
-                                  width: _width / 3,
-                                  height: _height / 20,
-                                  decoration: new BoxDecoration(
-                                      color: const Color(0xff575de3),
-                                      borderRadius: new BorderRadius.all(
-                                          new Radius.circular(_height / 40)),
-                                      boxShadow: [
-                                        new BoxShadow(
-                                            color: Colors.black87,
-                                            blurRadius: 2.0,
-                                            offset: new Offset(0.0, 1.0))
-                                      ]),
-                                  child: new     Center(
-            child: FormHelper.submitButton(
-              "test",
-              () {
 
-            
-        
-              
-
-              String id = "63f273f153d7eb35bdf32dcd";
-              APIService.getUserProfile().then(
-              (response) {
-       
-
-        if (response != null) {
-          //email = response['email'];
-          FormHelper.showSimpleAlertDialog(
-            context,
-            Config.appName,
-            response['tel'].toString(),
-            
-            "OK",
-            () {
-              Navigator.of(context).pop();
-            },
-          );
-        } else if (response == "Error fetching user profile.") {
-          FormHelper.showSimpleAlertDialog(
-            context,
-            Config.appName,
-            "error !!!!!!!",
-            "OK",
-            () {
-              Navigator.of(context).pop();
-            },
-          );
-        }
-      },
-    );
-
-                
-              },
-              btnColor: Color(0xff575de3),
-              borderColor: Colors.white,
-              txtColor: Colors.white,
-              borderRadius: 10,
-            ),
-          ),
-                                ),
-                              )
                             ],
                           ),
                         )
