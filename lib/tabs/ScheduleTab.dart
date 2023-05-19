@@ -11,87 +11,49 @@ class ScheduleTab extends StatefulWidget {
   @override
   State<ScheduleTab> createState() => _ScheduleTabState();
 }
+
 List<Map<String, dynamic>> schedules = [];
+
 enum FilterStatus { Encours, Complet, Annuler }
-Future<void> fetchdates() async {
 
-  try {
-    schedules = [];
-    final response = await APIService.getReservation();
-    print("Test");
-    schedules = response as List<Map<String, dynamic>>;
-    print(schedules);
-  } catch (error) {
-    print(error);
-  }
+Future<List<Map<String, dynamic>>> fetchdates() async {
+  List<Map<String, dynamic>> schedules = [];
+  final response = await APIService.getReservation();
+  print("Test");
+  schedules = response as List<Map<String, dynamic>>;
+  return schedules;
 }
-
-// List<Map> schedules = [
-//   {
-//     'img': 'assets/doctor01.jpeg',
-//     'doctorName': 'Dr. Anastasya Syahid',
-//     'doctorTitle': 'Dental Specialist',
-//     'reservedDate': 'Monday, Aug 29',
-//     'reservedTime': '11:00 - 12:00',
-//     'status': 0
-//   },
-//   {
-//     'img': 'assets/doctor02.png',
-//     'doctorName': 'Dr. Mauldya Imran',
-//     'doctorTitle': 'Skin Specialist',
-//     'reservedDate': 'Monday, Sep 29',
-//     'reservedTime': '11:00 - 12:00',
-//     'status': 1
-//   },
-//   {
-//     'img': 'assets/doctor03.jpeg',
-//     'doctorName': 'Dr. Rihanna Garland',
-//     'doctorTitle': 'General Specialist',
-//     'reservedDate': 'Monday, Jul 29',
-//     'reservedTime': '11:00 - 12:00',
-//     'status': 2
-//   },
-//   {
-//     'img': 'assets/doctor04.jpeg',
-//     'doctorName': 'Dr. John Doe',
-//     'doctorTitle': 'Something Specialist',
-//     'reservedDate': 'Monday, Jul 29',
-//     'reservedTime': '11:00 - 12:00',
-//     'status': 0
-//   },
-//   {
-//     'img': 'assets/doctor05.jpeg',
-//     'doctorName': 'Dr. Sam Smithh',
-//     'doctorTitle': 'Other Specialist',
-//     'reservedDate': 'Monday, Jul 29',
-//     'reservedTime': '11:00 - 12:00',
-//     'status': 1
-//   },
-//   {
-//     'img': 'assets/doctor05.jpeg',
-//     'doctorName': 'Dr. Sam Smithh',
-//     'doctorTitle': 'Other Specialist',
-//     'reservedDate': 'Monday, Jul 29',
-//     'reservedTime': '11:00 - 12:00',
-//     'status': 0
-//   },
-// ];
 
 class _ScheduleTabState extends State<ScheduleTab> {
   FilterStatus status = FilterStatus.Encours;
-  int currentStatus = 0 ;
+  int currentStatus = 0;
   Alignment _alignment = Alignment.centerLeft;
-
+  @override
   void initState() {
     super.initState();
-    fetchdates();
+    initializeData();
   }
+
+  Future<void> initializeData() async {
+    List<Map<String, dynamic>> tab = await fetchdates();
+    setState(() {
+      schedules = tab;
+    });
+  }
+
   void _callApiFunction(String id) async {
     // Your API call code here
     print("Test confirmed");
     var response = await APIService.annulerReservation(id);
-    if(response == "Success")
-    Navigator.pushNamed(context, '/ScheduleTab');
+    if (response == "Success") {
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          transitionDuration: Duration.zero,
+          pageBuilder: (context, animation1, animation2) => ScheduleTab(),
+        ),
+      );
+    }
   }
 
   @override
@@ -222,101 +184,102 @@ class _ScheduleTabState extends State<ScheduleTab> {
                           SizedBox(
                             height: 15,
                           ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Color(MyColors.bg03),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      width: double.infinity,
-                      padding: EdgeInsets.all(20),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                color: Color(MyColors.primary),
-                                size: 15,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                  _schedule['date'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(MyColors.primary),
-                                  fontWeight: FontWeight.bold,
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Color(MyColors.bg03),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            width: double.infinity,
+                            padding: EdgeInsets.all(20),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.calendar_today,
+                                      color: Color(MyColors.primary),
+                                      size: 15,
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      _schedule['date'],
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color(MyColors.primary),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.access_alarm,
+                                      color: Color(MyColors.primary),
+                                      size: 17,
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      _schedule['heure'],
+                                      style: TextStyle(
+                                        color: Color(MyColors.primary),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.access_alarm,
-                                color: Color(MyColors.primary),
-                                size: 17,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                _schedule['heure'],
-                                style: TextStyle(
-                                  color: Color(MyColors.primary),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
                           SizedBox(
                             height: 15,
                           ),
-                          if(currentStatus == 0)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  child: Text('Annuler'),
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text('Confirmation'),
-                                          content: Text('Êtes-vous sûr de vouloir annuler la réservation ?'),
-                                          actions: [
-                                            TextButton(
-                                              child: Text('Cancel'),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                            ),
-                                            TextButton(
-                                              child: Text('Confirm'),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                                // Call the API function with the id
-                                                _callApiFunction(_schedule['id']);
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
+                          if (currentStatus == 0)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    child: Text('Annuler'),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('Confirmation'),
+                                            content: Text(
+                                                'Êtes-vous sûr de vouloir annuler la réservation ?'),
+                                            actions: [
+                                              TextButton(
+                                                child: Text('Cancel'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: Text('Confirm'),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                  // Call the API function with the id
+                                                  _callApiFunction(
+                                                      _schedule['id']);
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ],
-                          )
-
+                              ],
+                            )
                         ],
                       ),
                     ),
@@ -332,7 +295,7 @@ class _ScheduleTabState extends State<ScheduleTab> {
 }
 
 class DateTimeCard extends StatelessWidget {
-  const DateTimeCard( {
+  const DateTimeCard({
     Key? key,
     required String date,
     required String time,

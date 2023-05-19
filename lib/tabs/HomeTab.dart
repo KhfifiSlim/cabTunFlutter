@@ -6,13 +6,11 @@ import '../services/api_service.dart';
 import '../services/shared_service.dart';
 
 List<Map> doctors = [
- 
   {
     'img': 'assets/doctor03.jpeg',
     'doctorName': 'Dr. Rosa Williamson',
     'doctorTitle': 'Skin Specialist'
   }
- 
 ];
 
 class HomeTab extends StatelessWidget {
@@ -27,7 +25,6 @@ class HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Container(
@@ -37,7 +34,7 @@ class HomeTab extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
-            UserIntro(usernameSet:usernameSet),
+            UserIntro(usernameSet: usernameSet),
             SizedBox(
               height: 10,
             ),
@@ -89,12 +86,11 @@ class HomeTab extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
-           
-              TopDoctorCard(
-                img: 'assets/doctor03.jpeg',
-                doctorName: "Dr . Ben Mohemd",
-                doctorTitle: "Skin Specialist",
-              )
+            TopDoctorCard(
+              img: 'assets/doctor03.jpeg',
+              doctorName: "Dr . Ben Mohamed",
+              doctorTitle: "Skin Specialist",
+            )
           ],
         ),
       ),
@@ -274,14 +270,9 @@ class AppointmentCard extends StatelessWidget {
   }
 }
 
-
-
 List<Map> categories = [
-  {'icon': Icons.calendar_month,
-    
-   'text': 'Prend rendez-vous'},
+  {'icon': Icons.calendar_month, 'text': 'Prend rendez-vous'},
   {'icon': Icons.local_hospital, 'text': 'Mes réservations'},
-
 ];
 
 class CategoryIcons extends StatelessWidget {
@@ -294,18 +285,14 @@ class CategoryIcons extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-    
-          CategoryIcon(
-        icon: Icons.calendar_month,
-    
-   text: 'Prend rendez-vous',
- url:"/rendezvous"
-          ),
-  CategoryIcon(
-           icon: Icons.local_hospital, 
-  text: 'Mes réservations',
-   url:"/ScheduleTab"
-  ),
+        CategoryIcon(
+            icon: Icons.calendar_month,
+            text: 'Prend rendez-vous',
+            url: "/rendezvous"),
+        CategoryIcon(
+            icon: Icons.local_hospital,
+            text: 'Mes réservations',
+            url: "/ScheduleTab"),
       ],
     );
   }
@@ -378,7 +365,9 @@ class CategoryIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       splashColor: Color(MyColors.bg01),
-      onTap: () {Navigator.pushNamed(context, url);},
+      onTap: () {
+        Navigator.pushNamed(context, url);
+      },
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: Column(
@@ -394,7 +383,6 @@ class CategoryIcon extends StatelessWidget {
                 icon,
                 color: Color(MyColors.primary),
               ),
-              
             ),
             SizedBox(
               height: 10,
@@ -415,16 +403,12 @@ class CategoryIcon extends StatelessWidget {
 }
 
 class SearchInput extends StatelessWidget {
-
   const SearchInput({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
-
-
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -464,50 +448,43 @@ class SearchInput extends StatelessWidget {
 }
 
 class UserIntro extends StatelessWidget {
-       static String usernameconnect="user" ;
+  static String usernameconnect = "user";
 
   final usernameSet;
 
-  const UserIntro({
-    Key? key,
-    required this.usernameSet
-   
-  }) : super(key: key);
-
+  const UserIntro({Key? key, required this.usernameSet}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    
     Future<void> fetchUserProfile() async {
-  try {
-    final response = await APIService.getUserProfile();
-   // email = response['email'];
-     usernameconnect = response['username'];
-     print('userconnected : ${usernameconnect}');
-   // tel = response['tel'].toString();
-  } catch (error) {
-    print(error);
-  }
-}
+      try {
+        final response = await APIService.getUserProfile();
+        // email = response['email'];
+        usernameconnect = response['username'];
+        print('userconnected : ${usernameconnect}');
+        // tel = response['tel'].toString();
+      } catch (error) {
+        print(error);
+      }
+    }
 
 // Call the function
-fetchUserProfile();
+    fetchUserProfile();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-          //crossAxisAlignment: CrossAxisAlignment.start,
-          //children: const [
-            new Text(
-              'Bonjour ',
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
-            ),
-            new Text(
-              '$usernameSet 👋',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            ),
-          
-        
+        //crossAxisAlignment: CrossAxisAlignment.start,
+        //children: const [
+        new Text(
+          'Bonjour ',
+          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+        ),
+        new Text(
+          '$usernameSet 👋',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+
         new IconButton(
           icon: const Icon(
             Icons.logout,
@@ -517,17 +494,16 @@ fetchUserProfile();
             SharedService.logout(context);
           },
         ),
-      
+
         new GestureDetector(
           onTap: () {
             Navigator.pushNamed(context, '/profile');
           },
           child: CircleAvatar(
-            backgroundImage: AssetImage('assets/person.jpeg'),
+            backgroundImage: AssetImage('assets/aa.jpg'),
           ),
         ),
       ],
     );
   }
 }
-

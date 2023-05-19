@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter+NodeJS+JWT'),
+        title: Text('CabTUN'),
         elevation: 0,
         actions: [
           IconButton(

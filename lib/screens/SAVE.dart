@@ -3,7 +3,6 @@ import '../services/api_service.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../config.dart';
-import 'home.dart';
 
 class DatePicker extends StatefulWidget {
   @override
@@ -11,8 +10,6 @@ class DatePicker extends StatefulWidget {
 }
 
 class _DatePickerState extends State<DatePicker> {
-  var testOnchange = "";
-
   TextEditingController _textFieldController = TextEditingController();
   @override
   void initState() {
@@ -89,29 +86,7 @@ class _DatePickerState extends State<DatePicker> {
     //debugPrint('Response body: ${token}');
 
     if (message == "Success") {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Success'),
-            content: Text("Votre rendez-vous a été reservé avec succée !"),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      transitionDuration: Duration.zero,
-                      pageBuilder: (context, animation1, animation2) => Home(),
-                    ),
-                  );
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      print("ADD");
     } else {
       return "error";
     }
@@ -375,21 +350,13 @@ class _DatePickerState extends State<DatePicker> {
       text:
           'Date: ${selectedDate.day}/${selectedDate.month}/${selectedDate.year} - $selectedTime',
     );
-    // if (dateChange ==  0) {
-    //   if (dateChange > 0) {
-    //     getHeureByDate();
-    //   }
-    //   dateChange++;
-    // }
-
-    if (testOnchange == "") {
-      testOnchange =
-          '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}';
-    }
-    if (testOnchange !=
-        '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}') {
-      print("THE SELECTED ---------------" + selectedDate.toString());
-      getHeureByDate();
+    var test = "";
+    if (selectedDate != test) {
+      if (dateChange > 0) {
+        print("SELECTED DATE CAHNGED ..........................");
+        getHeureByDate();
+      }
+      dateChange++;
     }
 
     return Scaffold(
@@ -474,6 +441,29 @@ class _DatePickerState extends State<DatePicker> {
                   style: TextStyle(fontSize: 16),
                 ),
               ),
+              SizedBox(height: 1),
+              // Date picker button
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.white,
+                  onPrimary: Colors.black,
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () => getHeureByDate(),
+                child: Text(
+                  'Confirmer date',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+
+              SizedBox(height: 20),
+              Text(
+                'Date: ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                style: TextStyle(fontSize: 16.0),
+              ),
 
               Container(
                   margin: EdgeInsets.only(
@@ -499,9 +489,28 @@ class _DatePickerState extends State<DatePicker> {
                                 width: 10,
                               ),
                             ),
+                            Expanded(
+                              child: SizedBox(
+                                width: 100,
+                                child: Text(
+                                  'Heure : $selectedTime',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: SizedBox(
+                                width: 10,
+                                child: Text(
+                                  'Heure api : $heureFromApi',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
+                      SizedBox(height: 25),
                       Row(
                         children: [
                           Expanded(
